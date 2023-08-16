@@ -43,7 +43,7 @@ if [ "${CBUS_CLOCK:-1}" != "1" ]; then
     CMQTTD_ARGS="${CMQTTD_ARGS} --no-clock"
 fi
 
-if [ "${MQTT_USE_TLS:-1}" -eq "1" ]; then
+if [ "${MQTT_USE_TLS:-1}" = "1" ]; then
     echo "Using TLS to connect to MQTT broker."
 
     # Using TLS, check for certificates directory
