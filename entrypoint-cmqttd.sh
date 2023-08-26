@@ -82,12 +82,19 @@ else
     echo "${CMQTTD_PROJECT_FILE} not found; using generated labels."
 fi
 
+if [ -n "${VERBOSITY}" ]; then
+    echo "Setting log verbosity to ${VERBOSITY}"
+    CMQTTD_ARGS="${CMQTTD_ARGS} --verbosity ${VERBOSITY}"
+fi
+
 echo ">${CMQTTD_CBUS_NETWORK}<"
 
 if [ -n "${CMQTTD_CBUS_NETWORK}" ]; then
     echo "Loading C-Bus network ${CMQTTD_CBUS_NETWORK}"
     CMQTTD_ARGS="${CMQTTD_ARGS} --cbus-network  ${CMQTTD_CBUS_NETWORK}"
 fi
+
+
 
 echo ""
 
