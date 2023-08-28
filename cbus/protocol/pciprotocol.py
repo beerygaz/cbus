@@ -348,40 +348,44 @@ class PCIProtocol(CBusProtocol):
         Sends a packet of CBus data.
 
         """
-        transport = self._transport
-        if transport is None:
-            raise IOError('transport not connected')
-        if not isinstance(cmd, BasePacket):
-            raise TypeError('cmd must be BasePacket')
-        logger.debug(f'send: {cmd!r}')
+        try:
+            transport = self._transport
+            if transport is None:
+                raise IOError('transport not connected')
+            if not isinstance(cmd, BasePacket):
+                raise TypeError('cmd must be BasePacket')
+            logger.debug(f'send (base): {cmd!r}')
 
-        checksum = False
+            checksum = False
 
-        if isinstance(cmd, SpecialClientPacket):
-            basic_mode = True
-            confirmation = False
+            if isinstance(cmd, SpecialClientPacket):
+                basic_mode = True
+                confirmation = False
 
-        cmd = cmd.encode_packet()
+            cmd = cmd.encode_packet()
 
-        if not basic_mode:
-            cmd = b'\\' + cmd
+            if not basic_mode:
+                cmd = b'\\' + cmd
 
-        if checksum:
-            cmd = add_cbus_checksum(cmd)
+            if checksum:
+                cmd = add_cbus_checksum(cmd)
 
-        if confirmation:
-            conf_code = self._get_confirmation_code()
-            cmd += conf_code
+            if confirmation:
+                conf_code = self._get_confirmation_code()
+                cmd += conf_code
 
-            # TODO: implement proper handling of confirmation codes.
-        else:
-            conf_code = None
+                # TODO: implement proper handling of confirmation codes.
+            else:
+                conf_code = None
 
-        cmd += END_COMMAND
-        logger.debug(f'send: {cmd!r}')
+            cmd += END_COMMAND
+            logger.debug(f'send (encoded): {cmd!r}')
 
-        transport.write(cmd)
-        return conf_code
+            transport.write(cmd)
+            return conf_code
+        except Exception as e:
+            logger.exception('error sending packet')
+            raise e
 
     def pci_reset(self):
         """
