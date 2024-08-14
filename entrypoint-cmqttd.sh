@@ -43,7 +43,7 @@ if [ "${CBUS_CLOCK:-1}" != "1" ]; then
     CMQTTD_ARGS="${CMQTTD_ARGS} --no-clock"
 fi
 
-if [ "${MQTT_USE_TLS:-1}" == "1" ]; then
+if [ "${MQTT_USE_TLS:-1}" = "1" ]; then
     echo "Using TLS to connect to MQTT broker."
 
     # Using TLS, check for certificates directory
@@ -82,6 +82,11 @@ else
     echo "${CMQTTD_PROJECT_FILE} not found; using generated labels."
 fi
 
+if [ -n "${VERBOSITY}" ]; then
+    echo "Setting log verbosity to ${VERBOSITY}"
+    CMQTTD_ARGS="${CMQTTD_ARGS} --verbosity ${VERBOSITY}"
+fi
+
 echo ">${CMQTTD_CBUS_NETWORK}<"
 
 if [ -n "${VERBOSITY}" ]; then
@@ -93,6 +98,8 @@ if [ -n "${CMQTTD_CBUS_NETWORK}" ]; then
     echo "Loading C-Bus network ${CMQTTD_CBUS_NETWORK}"
     CMQTTD_ARGS="${CMQTTD_ARGS} --cbus-network ${CMQTTD_CBUS_NETWORK}"
 fi
+
+
 
 echo ""
 # Announce what we think local time is on start-up. This will be sent to the C-Bus network.
