@@ -89,15 +89,19 @@ fi
 
 echo ">${CMQTTD_CBUS_NETWORK}<"
 
+if [ -n "${VERBOSITY}" ]; then
+    echo "Setting log verbosity to ${VERBOSITY}"
+    CMQTTD_ARGS="${CMQTTD_ARGS} --verbosity ${VERBOSITY}"
+fi
+
 if [ -n "${CMQTTD_CBUS_NETWORK}" ]; then
     echo "Loading C-Bus network ${CMQTTD_CBUS_NETWORK}"
-    CMQTTD_ARGS="${CMQTTD_ARGS} --cbus-network  ${CMQTTD_CBUS_NETWORK}"
+    CMQTTD_ARGS="${CMQTTD_ARGS} --cbus-network ${CMQTTD_CBUS_NETWORK}"
 fi
 
 
 
 echo ""
-
 # Announce what we think local time is on start-up. This will be sent to the C-Bus network.
 echo "Local time zone: ${TZ:-UTC}"
 echo -n "Current time: "

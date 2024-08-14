@@ -8,17 +8,18 @@
 # $ docker build -t cmqttd .
 # $ docker run --device /dev/ttyUSB0 -e "SERIAL_PORT=/dev/ttyUSB0" \
 #     -e "MQTT_SERVER=192.2.0.1" -e "TZ=Australia/Adelaide" -it cmqttd
+
 FROM python:3.11-slim as base
 # Bumped to python 3.11 using the python 3.11-slim image to overcome the 
 # error: externally-managed-environment error when building the container
-# python 3.10 required, at date this file is created only available in alpine:edge
 
 # Install most Python deps here, because that way we don't need to include build tools in the
 # final image.
-RUN pip3 install 'parameterized' 'six' 'cffi' 'paho-mqtt' 'pyserial==3.5' 'pyserial_asyncio==0.6'
+
+RUN pip3 install 'six' 'cffi' 'paho-mqtt' 'pyserial==3.5' 'pyserial_asyncio==0.6'
 
 # Runs tests and builds a distribution tarball
-FROM base as builder
+FROM base AS builder
 # See also .dockerignore
 ADD . /cbus
 WORKDIR /cbus
@@ -26,7 +27,7 @@ RUN python3 -m unittest && \
     python3 setup.py bdist -p generic --format=gztar
 
 # cmqttd runner image
-FROM base as cmqttd
+FROM base AS cmqttd
 COPY COPYING COPYING.LESSER Dockerfile README.md entrypoint-cmqttd.sh /
 RUN sed -i 's/\r$//' entrypoint-cmqttd.sh 
 COPY --from=builder /cbus/dist/cbus-0.2.generic.tar.gz /
@@ -34,4 +35,4 @@ RUN tar zxf /cbus-0.2.generic.tar.gz && rm /cbus-0.2.generic.tar.gz
 COPY cmqttd_config/ /etc/cmqttd/ 
 
 # Runs cmqttd itself
-CMD /entrypoint-cmqttd.sh
+CMD ["./entrypoint-cmqttd.sh"]
